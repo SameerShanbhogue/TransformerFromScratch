@@ -32,7 +32,7 @@ def get_or_build_tokenizer(config, ds, lang):
         tokenizer = Tokenizer(WordLevel(unk_token="UNK"))
         tokenizer.pre_tokenizer = Whitespace()
         trainer = WordLevelTrainer(special_tokens=["UNK", "PAD", "SOS", "EOS"], min_frequency = 2)
-        tokenizer.train_from_iterator(et_all_sentences(ds,lang),trainer=trainer)
+        tokenizer.train_from_iterator(get_all_sentences(ds,lang),trainer=trainer)
         tokenizer.save(str(tokenizer_path))
     else:
         tokenizer = Tokenizer.from_file(str(tokenizer_path))
@@ -111,7 +111,7 @@ def run_validation(model, validation_ds, tokenizer_src, tokenizer_tgt, max_len, 
 
 
     try:
-        with os.popen('stty size', r) as console:
+        with os.popen('stty size', 'r') as console:
             _, console_width = console.read().split()
             console_width = int(console_width)
 
@@ -137,7 +137,7 @@ def run_validation(model, validation_ds, tokenizer_src, tokenizer_tgt, max_len, 
             predicated.append(model_out_text)
 
 
-            print_msg('_'*cconsole_width)
+            print_msg('_'*console_width)
             print_msg(f"{f'SOURCE:':>12}{source_text}")
             print_msg(f"{f'TARGET:':>12}{target_text}")
             print_msg(f"{f'PREDICTED:':>12}{model_out_text}")
@@ -218,7 +218,7 @@ def train_model(config):
             writer.add_scalar('train loss', loss.item(),global_step)
             writer.flush()
 
-            loss_backward()
+            loss.backward()
 
             optimizer.step()
             optimizer.zero_grad(set_to_none=True)
