@@ -25,14 +25,21 @@ class BilingualDataset(Dataset):
         src_tgt_pair = self.ds[idx]
         src_text = src_tgt_pair['translation'][self.src_lang]
         tgt_text = src_tgt_pair['translation'][self.tgt_lang]
+        print(src_text)
+        print(tgt_text)
 
         enc_input_tokens = self.src_tokenizer.encode(src_text).ids
         dec_input_tokens = self.tgt_tokenizer.encode(tgt_text).ids
+
+        print(len(enc_input_tokens))
+        print(len(dec_input_tokens))
          
         enc_num_padding_tokens = self.seq_len-len(enc_input_tokens)-2
         dec_num_padding_tokens = self.seq_len-len(dec_input_tokens)-1 
 
-        if enc_num_padding_tokens > 0 or dec_num_padding_tokens > 0:
+        print(enc_num_padding_tokens,dec_num_padding_tokens,self.seq_len)
+
+        if enc_num_padding_tokens < 0 or dec_num_padding_tokens < 0:
             raise ValueError("Sentence too long")
         
 
@@ -59,15 +66,15 @@ class BilingualDataset(Dataset):
             [
                 
                 torch.tensor(dec_input_tokens, dtype=torch.int64),
-                self.eos_token_token,
+                self.eos_token,
                 torch.tensor([self.pad_token]*dec_num_padding_tokens, dtype=torch.int64)
             ],
             dim=0
         )
 
-        assert encoder_input.size(0) == seq_len
-        assert decoder_input.size(o) == seq_len
-        assert label.size(0) == seq_len
+        assert encoder_input.size(0) == self.seq_len
+        assert decoder_input.size(0) == self.seq_len
+        assert label.size(0) == self.seq_len
 
         return {
             "encoder_input" : encoder_input,

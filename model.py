@@ -7,9 +7,10 @@ class InputEmbeddings(nn.Module):
       super().__init__()
       self.d_model = d_model
       self.vocab_size = vocab_size
-      self.embedding = nn.Embedding(d_model,vocab_size)
+      self.embedding = nn.Embedding(vocab_size,d_model)
 
     def forward(self, x):
+       #print(self.vocab_size)
        return self.embedding(x) * math.sqrt(self.d_model)
        
        
@@ -30,7 +31,7 @@ class PoistionEncoding(nn.Module):
       self.register_buffer('pe', pe)
 
    def forward(self, x):
-      x = x + (self.pe[:, :x.shape[1],:]).requires_grad_(False)
+      x = x + (self.pe[:,:x.shape[1],:]).requires_grad_(False)
       return self.dropout(x)
       
 class LayerNormalization(nn.Module):

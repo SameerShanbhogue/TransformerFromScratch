@@ -189,10 +189,10 @@ def train_model(config):
        optimizer.load_state_dict(state['optimzer_state_dict'])
        global_step = state['global_step']
     else:
-        print("No mdel to preload starting from strach")
+        print("No model to preload starting from scratch")
 
 
-    loss_fn = nn.CrossEntropyLoss(ignore_index=tokenizer_src.token_to_id(['PADS']), label_smoothing=0.1).to(device)
+    loss_fn = nn.CrossEntropyLoss(ignore_index=tokenizer_src.token_to_id('[PADS]'), label_smoothing=0.1).to(device)
 
     for epoch in range(initial_epoch, config['num_epochs']):
         torch.cuda.empty_cache()
@@ -201,7 +201,7 @@ def train_model(config):
         for batch in batch_iterator:
 
 
-            encoder_input = batch['encode_input'].to(device)
+            encoder_input = batch['encoder_input'].to(device)
             decoder_input = batch['decoder_input'].to(device)
             encoder_mask = batch['encoder_mask'].to((device))
             decoder_mask = batch['decoder_mask'].to(device)
