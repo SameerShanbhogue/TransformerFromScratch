@@ -28,7 +28,7 @@ def get_all_sentences(ds, lang):
 
 def get_or_build_tokenizer(config, ds, lang):
     tokenizer_path = Path(config['tokenizer_file'].format(lang))
-    if not Path.exits(tokenizer_path):
+    if not Path.exists(tokenizer_path):
         tokenizer = Tokenizer(WordLevel(unk_token="UNK"))
         tokenizer.pre_tokenizer = Whitespace()
         trainer = WordLevelTrainer(special_tokens=["UNK", "PAD", "SOS", "EOS"], min_frequency = 2)
@@ -39,7 +39,7 @@ def get_or_build_tokenizer(config, ds, lang):
     return tokenizer  
 
 def get_ds(config):
-    ds_raw = load_dataset(f"{config['datasource']}",f"{config['lang_src']-config['lang_tgt']}", split="train")
+    ds_raw = load_dataset(f"{config['datasource']}",f"{config['lang_src']}-{config['lang_tgt']}", split="train")
 
     tokenizer_src = get_or_build_tokenizer(config, ds_raw, config['lang_src'])
     tokenizer_tgt = get_or_build_tokenizer(config, ds_raw, config['lang_tgt'])
@@ -179,7 +179,7 @@ def train_model(config):
     initial_epoch = 0
     global_step = 0
 
-    preload = config['prelaod']
+    preload = config['preload']
     model_filename = latest_weights_file_path(config) if preload == 'latest' else get_weights_file_path(config,preload) if preload else None
     if model_filename:
        print(f'Preloading model{model_filename}') 
@@ -192,7 +192,7 @@ def train_model(config):
         print("No mdel to preload starting from strach")
 
 
-    loss_fn = nn.CrossEntropyLoss(ignore_index=tokenizer_src.token_to_id['PADS'], label_smoothing=0.1).to(device)
+    loss_fn = nn.CrossEntropyLoss(ignore_index=tokenizer_src.token_to_id(['PADS']), label_smoothing=0.1).to(device)
 
     for epoch in range(initial_epoch, config['num_epochs']):
         torch.cuda.empty_cache()

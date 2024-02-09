@@ -4,7 +4,7 @@ import math
 
 class InputEmbeddings(nn.Module):
     def __init__(self, d_model: int, vocab_size: int) -> None:
-      super.__init__()
+      super().__init__()
       self.d_model = d_model
       self.vocab_size = vocab_size
       self.embedding = nn.Embedding(d_model,vocab_size)
@@ -22,8 +22,8 @@ class PoistionEncoding(nn.Module):
       self.dropout = nn.Dropout(dropout)
 
       pe = torch.zeros(seq_len, d_model)
-      position = torch.arrange(0, seq_len, dtype=torch.float).unsqueeze(1)
-      dev_term = torch.exp(torch.arrange(0,d_model,2).float() * (-math.log(10000.0)/d_model))
+      position = torch.arange(0, seq_len, dtype=torch.float).unsqueeze(1)
+      dev_term = torch.exp(torch.arange(0,d_model,2).float() * (-math.log(10000.0)/d_model))
       pe[:,0::2] = torch.sin(position * dev_term)
       pe[:,1::2] = torch.cos(position * dev_term)
       pe.unsqueeze(0)
@@ -229,7 +229,7 @@ def build_transformer(src_vocab_size: int, tgt_vocab_size: int, src_seq_len: int
 
     transformer = Transformer(encoder,decoder,src_embed,tgt_embed,src_pos,tgt_pos,projection_layer) 
 
-    for p in transformer:
+    for p in transformer.parameters():
        if p.dim() > 1:
           nn.init.xavier_uniform_(p)
 

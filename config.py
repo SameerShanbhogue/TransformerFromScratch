@@ -1,6 +1,7 @@
 from pathlib import Path
 
-def get_config(): {
+def get_config(): 
+    return {
     "batch_size": 8,
     "num_epochs": 20,
     "lr": 10**-4,
@@ -15,7 +16,7 @@ def get_config(): {
     "tokenizer_file": "tokenizer_(0),json",
     "experiment_name": "runs/tmodel"
 
-}
+    }
     
 
 def get_weights_file_path(config, epoch: str):
@@ -26,7 +27,7 @@ def get_weights_file_path(config, epoch: str):
 
 def latest_weights_file_path(config):
     model_folder = f"{config['datasource']}_{config['model_folder']}"
-    model_filename = f"{config['model_basename']}{epoch}.pt"
+    model_filename = f"{config['model_basename']}*"
     weights_file = list(Path(model_folder).glob(model_filename))
     if len(weights_file) == 0:
         return None
