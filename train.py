@@ -29,9 +29,9 @@ def get_all_sentences(ds, lang):
 def get_or_build_tokenizer(config, ds, lang):
     tokenizer_path = Path(config['tokenizer_file'].format(lang))
     if not Path.exists(tokenizer_path):
-        tokenizer = Tokenizer(WordLevel(unk_token="UNK"))
+        tokenizer = Tokenizer(WordLevel(unk_token="[UNK]"))
         tokenizer.pre_tokenizer = Whitespace()
-        trainer = WordLevelTrainer(special_tokens=["UNK", "PAD", "SOS", "EOS"], min_frequency = 2)
+        trainer = WordLevelTrainer(special_tokens=["[UNK]", "[PAD]", "[SOS]", "[EOS]"], min_frequency = 2)
         tokenizer.train_from_iterator(get_all_sentences(ds,lang),trainer=trainer)
         tokenizer.save(str(tokenizer_path))
     else:
@@ -61,8 +61,8 @@ def get_ds(config):
         max_len_src = max(max_len_src,len(src_ids))
         max_len_tgt = max(max_len_tgt,len(tgt_ids))
 
-    print(f'Max lenght of Source Sentence: (max_len_src)')
-    print(f'Max lenght of Target Sentence: (max_len_tgt)')
+    print(f'Max lenght of Source Sentence: {max_len_src}')
+    print(f'Max lenght of Target Sentence: {max_len_tgt}')
 
     train_dataloader = DataLoader(train_ds, batch_size=config['batch_size'], shuffle=True)
     val_dataloader = DataLoader(val_ds, batch_size=1, shuffle=True)
@@ -191,8 +191,8 @@ def train_model(config):
     else:
         print("No model to preload starting from scratch")
 
-
-    loss_fn = nn.CrossEntropyLoss(ignore_index=tokenizer_src.token_to_id('[PADS]'), label_smoothing=0.1).to(device)
+    print("Pads",tokenizer_src.token_to_id('[PAD]'))
+    loss_fn = nn.CrossEntropyLoss(ignore_index=tokenizer_src.token_to_id('[PAD]'), label_smoothing=0.1).to(device)
 
     for epoch in range(initial_epoch, config['num_epochs']):
         torch.cuda.empty_cache()

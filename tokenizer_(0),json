@@ -5,7 +5,7 @@
   "added_tokens": [
     {
       "id": 0,
-      "content": "UNK",
+      "content": "[UNK]",
       "single_word": false,
       "lstrip": false,
       "rstrip": false,
@@ -14,7 +14,7 @@
     },
     {
       "id": 1,
-      "content": "PAD",
+      "content": "[PAD]",
       "single_word": false,
       "lstrip": false,
       "rstrip": false,
@@ -23,7 +23,7 @@
     },
     {
       "id": 2,
-      "content": "SOS",
+      "content": "[SOS]",
       "single_word": false,
       "lstrip": false,
       "rstrip": false,
@@ -32,7 +32,7 @@
     },
     {
       "id": 3,
-      "content": "EOS",
+      "content": "[EOS]",
       "single_word": false,
       "lstrip": false,
       "rstrip": false,
@@ -49,10 +49,10 @@
   "model": {
     "type": "WordLevel",
     "vocab": {
-      "UNK": 0,
-      "PAD": 1,
-      "SOS": 2,
-      "EOS": 3,
+      "[UNK]": 0,
+      "[PAD]": 1,
+      "[SOS]": 2,
+      "[EOS]": 3,
       ",": 4,
       "the": 5,
       "and": 6,
@@ -15748,6 +15748,6 @@
       "‘": 15696,
       "”—": 15697
     },
-    "unk_token": "UNK"
+    "unk_token": "[UNK]"
   }
 }

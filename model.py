@@ -84,8 +84,9 @@ class MultiHeadAttentionBlock(nn.Module):
       d_k = query.shape[-1]
 
       attention_scores = (query @ key.transpose(-2,-1))/math.sqrt(d_k)
+      print(attention_scores.shape)
       if mask is not None:
-         attention_scores.masked_fill_(mask == 0, -1e9)
+         attention_scores=attention_scores.masked_fill_(mask == 0, -1e9)
       attention_scores = attention_scores.softmax(dim=-1)
 
       if dropout is not None:
@@ -98,7 +99,7 @@ class MultiHeadAttentionBlock(nn.Module):
 
    def forward(self,q,k,v,mask):
       query = self.w_q(q)
-      key = self.w_k(q)
+      key = self.w_k(k)
       value = self.w_v(v)
 
       query = query.view(query.shape[0], query.shape[1],self.h,self.d_k).transpose(1,2)
@@ -130,7 +131,7 @@ class EncoderBlock(nn.Module):
 
    def forward(self, x, src_mask):
       x = self.residual_connections[0](x, lambda x: self.self_attention_block(x,x,x,src_mask))
-      x = self.residual_connections[1](x,self.feed_forward_block(x))
+      x = self.residual_connections[1](x,self.feed_forward_block)
       return x
 
 class Encoder(nn.Module):
@@ -154,7 +155,7 @@ class DecoderBlock(nn.Module):
 
    def forward(self, x, encoder_output, src_mask, tgt_mask):
       x = self.residual_connections[0](x, lambda x: self.self_attention_block(x,x,x,tgt_mask))
-      x = self.residual_connections[1](x, lambda x: self.cross_attention_block(encoder_output,encoder_output,x,src_mask))
+      x = self.residual_connections[1](x, lambda x: self.cross_attention_block(x,encoder_output,encoder_output,src_mask))
       x = self.residual_connections[2](x,self.feed_forward_block)
       
       return x
