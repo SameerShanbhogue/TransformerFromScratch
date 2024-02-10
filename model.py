@@ -27,10 +27,15 @@ class PoistionEncoding(nn.Module):
       dev_term = torch.exp(torch.arange(0,d_model,2).float() * (-math.log(10000.0)/d_model))
       pe[:,0::2] = torch.sin(position * dev_term)
       pe[:,1::2] = torch.cos(position * dev_term)
-      pe.unsqueeze(0)
+      pe = pe.unsqueeze(0)
       self.register_buffer('pe', pe)
+      
 
    def forward(self, x):
+      #self.pe = self.pe.unsqueeze(0)
+      #print("Shape of x:", x.shape)
+      #print("Shape of self.pe:", self.pe.shape)
+      
       x = x + (self.pe[:,:x.shape[1],:]).requires_grad_(False)
       return self.dropout(x)
       
@@ -100,7 +105,7 @@ class MultiHeadAttentionBlock(nn.Module):
       key = key.view(key.shape[0], key.shape[1],self.h,self.d_k).transpose(1,2)
       value = value.view(value.shape[0], value.shape[1],self.h,self.d_k).transpose(1,2)
 
-      x, self.attention_scores = MultiHeadAttentionBlock.attention(query,key.value,mask,self.dropout)
+      x, self.attention_scores = MultiHeadAttentionBlock.attention(query,key,value,mask,self.dropout)
       x = x.transpose(1,2).contiguous().view(x.shape[0],-1, self.h * self.d_k )
 
       return self.w_o(x)
@@ -111,10 +116,10 @@ class ResidualConnection(nn.Module):
    def __init__(self, features: int, dropout: float)-> None:
       super().__init__()
       self.dropout = nn.Dropout(dropout)
-      self.norn = LayerNormalization(features)
+      self.norm = LayerNormalization(features)
 
    def forward(self, x, sublayer):
-      return x + self.dropout(sublayer(self.norn(x)))
+      return x + self.dropout(sublayer(self.norm(x)))
       
 class EncoderBlock(nn.Module):
    def __init__(self, features: int, self_attention_block: MultiHeadAttentionBlock, feed_forward_block: FeedForwardBlock, dropout: float) -> None:
