@@ -53,8 +53,8 @@ class LayerNormalization(nn.Module):
       print(mean.device)
       print(std.device)
       print(self.alpha.device)
-      print(std.bias.device)
-      print(std.eps.device)
+      print(self.bias.device)
+      print(self.eps.device)
        
       return self.alpha * (x-mean)/ (std + self.eps) + self.bias
    
