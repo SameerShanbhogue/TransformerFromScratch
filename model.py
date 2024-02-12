@@ -54,8 +54,8 @@ class LayerNormalization(nn.Module):
       print(std.device)
       alpha = self.alpha.to(x.device)
       bias = self.bias.to(x.device) 
-      print(self.alpha.device)
-      print(self.bias.device)
+      print(alpha.device)
+      print(bias.device)
       
        
       return alpha * (x-mean)/ (std + self.eps) + bias
