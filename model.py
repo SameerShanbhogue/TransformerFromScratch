@@ -51,7 +51,10 @@ class LayerNormalization(nn.Module):
       mean = x.mean(dim=-1,keepdim = True)
       std = x.std(dim=-1, keepdim = True)
       print(mean.device)
-      print(std.device)  
+      print(std.device)
+      print(self.alpha.device)
+      print(std.bias.device)
+      print(std.eps.device)
        
       return self.alpha * (x-mean)/ (std + self.eps) + self.bias
    
