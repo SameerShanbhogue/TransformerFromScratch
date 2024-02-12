@@ -52,11 +52,13 @@ class LayerNormalization(nn.Module):
       std = x.std(dim=-1, keepdim = True)
       print(mean.device)
       print(std.device)
+      alpha = self.alpha.to(x.device)
+      bias = self.bias.to(x.device) 
       print(self.alpha.device)
       print(self.bias.device)
-      print(self.eps.device)
+      
        
-      return self.alpha * (x-mean)/ (std + self.eps) + self.bias
+      return alpha * (x-mean)/ (std + self.eps) + bias
    
 class FeedForwardBlock(nn.Module):
    def __init__(self, d_model: int, dff: int, dropout: float) -> None:
