@@ -47,17 +47,10 @@ class LayerNormalization(nn.Module):
       self.bias = nn.Parameter(torch.zeros(features))        
    
    def forward(self,x):
-      print(x.device)
+     
       mean = x.mean(dim=-1,keepdim = True)
       std = x.std(dim=-1, keepdim = True)
-      print(mean.device)
-      print(std.device)
-      alpha = self.alpha.to(x.device)
-      bias = self.bias.to(x.device) 
-      print(alpha.device)
-      print(bias.device)
-      
-       
+  
       return alpha * (x-mean)/ (std + self.eps) + bias
    
 class FeedForwardBlock(nn.Module):
