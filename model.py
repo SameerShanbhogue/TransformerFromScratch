@@ -47,6 +47,7 @@ class LayerNormalization(nn.Module):
       self.bias = nn.Parameter(torch.zeros(features))        
    
    def forward(self,x):
+      print(x.device) 
       mean = x.mean(dim=-1,keepdim = True)
       std = x.std(dim=-1, keepdim = True)
       return self.alpha * (x-mean)/ (std + self.eps) + self.bias
