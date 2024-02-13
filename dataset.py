@@ -25,7 +25,7 @@ class BilingualDataset(Dataset):
         src_tgt_pair = self.ds[idx]
         src_text = src_tgt_pair['translation'][self.src_lang]
         tgt_text = src_tgt_pair['translation'][self.tgt_lang]
-        #print(src_text)
+        print("BBBBBIIIIII")
         #print(tgt_text)
 
         enc_input_tokens = self.src_tokenizer.encode(src_text).ids
