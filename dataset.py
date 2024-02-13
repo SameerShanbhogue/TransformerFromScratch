@@ -25,19 +25,19 @@ class BilingualDataset(Dataset):
         src_tgt_pair = self.ds[idx]
         src_text = src_tgt_pair['translation'][self.src_lang]
         tgt_text = src_tgt_pair['translation'][self.tgt_lang]
-        print(src_text)
-        print(tgt_text)
+        #print(src_text)
+        #print(tgt_text)
 
         enc_input_tokens = self.src_tokenizer.encode(src_text).ids
         dec_input_tokens = self.tgt_tokenizer.encode(tgt_text).ids
 
-        print(len(enc_input_tokens))
-        print(len(dec_input_tokens))
+        #print(len(enc_input_tokens))
+        #print(len(dec_input_tokens))
          
         enc_num_padding_tokens = self.seq_len-len(enc_input_tokens)-2
         dec_num_padding_tokens = self.seq_len-len(dec_input_tokens)-1 
 
-        print(enc_num_padding_tokens,dec_num_padding_tokens,self.seq_len)
+        #print(enc_num_padding_tokens,dec_num_padding_tokens,self.seq_len)
 
         if enc_num_padding_tokens < 0 or dec_num_padding_tokens < 0:
             raise ValueError("Sentence too long")
@@ -80,7 +80,7 @@ class BilingualDataset(Dataset):
             "encoder_input" : encoder_input,
             "decoder_input" : decoder_input,
             "encoder_mask" : (encoder_input != self.pad_token).unsqueeze(0).unsqueeze(0).int(),
-            "decoder_mask" : (decoder_input != self.pad_token).unsqueeze(0).int()& causal_mask(decoder_input.size(0)),
+            "decoder_mask" : (decoder_input != self.pad_token).unsqueeze(0).int() & causal_mask(decoder_input.size(0)),
             "label":label,
             "src_text": src_text,
             "tgt_text":tgt_text
