@@ -111,7 +111,7 @@ def run_validation(model, validation_ds, tokenizer_src, tokenizer_tgt, max_len, 
 
     source_texts=[]
     expected =[]
-    predicated = []
+    predicted = []
 
 
     try:
@@ -138,7 +138,7 @@ def run_validation(model, validation_ds, tokenizer_src, tokenizer_tgt, max_len, 
 
             source_texts.append(source_text)
             expected.append(target_text)
-            predicated.append(model_out_text)
+            predicted.append(model_out_text)
 
 
             print_msg('_'*console_width)
