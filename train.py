@@ -225,7 +225,7 @@ def train_model(config):
 
             encoder_input = batch['encoder_input'].to(device)
             decoder_input = batch['decoder_input'].to(device)
-            encoder_mask = batch['encoder_mask'].to((device))
+            encoder_mask = batch['encoder_mask'].to(device)
             decoder_mask = batch['decoder_mask'].to(device)
 
             encoder_output = model.encode(encoder_input,encoder_mask)
