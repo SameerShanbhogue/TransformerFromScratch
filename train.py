@@ -213,7 +213,7 @@ def train_model(config):
     else:
         print("No model to preload starting from scratch")
 
-    print("Pads",tokenizer_src.token_to_id('[PAD]'))
+    
     loss_fn = nn.CrossEntropyLoss(ignore_index=tokenizer_src.token_to_id('[PAD]'), label_smoothing=0.1).to(device)
 
     for epoch in range(initial_epoch, config['num_epochs']):
