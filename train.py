@@ -12,6 +12,10 @@ from tqdm import tqdm
 from torch.utils.tensorboard import SummaryWriter
 import os
 
+import torchmetrics
+import torchtext.datasets as datasets
+from torch.optim.lr_scheduler import LambdaLR
+
 from datasets import load_dataset
 from tokenizers import Tokenizer
 from tokenizers.models import WordLevel
@@ -147,7 +151,25 @@ def run_validation(model, validation_ds, tokenizer_src, tokenizer_tgt, max_len, 
                 print_msg('_'*console_width)
                 break
 
+  if writer:
+        # Evaluate the character error rate
+        # Compute the char error rate 
+        metric = torchmetrics.CharErrorRate()
+        cer = metric(predicted, expected)
+        writer.add_scalar('validation cer', cer, global_step)
+        writer.flush()
 
+        # Compute the word error rate
+        metric = torchmetrics.WordErrorRate()
+        wer = metric(predicted, expected)
+        writer.add_scalar('validation wer', wer, global_step)
+        writer.flush()
+
+        # Compute the BLEU metric
+        metric = torchmetrics.BLEUScore()
+        bleu = metric(predicted, expected)
+        writer.add_scalar('validation BLEU', bleu, global_step)
+        writer.flush()           
             
 
         
@@ -231,13 +253,13 @@ def train_model(config):
             torch.save({
                 'epoch':epoch,
                 'model_state_dict': model.state_dict(),
-                'optimer_state_dict':optimizer.state_dict(),
+                'optimizer_state_dict':optimizer.state_dict(),
                 'global_step': global_step
             }, model_filename)
 
 
 if __name__ == '__main__':
-    print("hi")
+   
     warnings.filterwarnings("ignore")
     config=get_config()
     train_model(config)            
