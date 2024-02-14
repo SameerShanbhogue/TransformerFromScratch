@@ -2,6 +2,31 @@ import torch
 import torch.nn as nn
 import math
 
+class LayerNormalization(nn.Module):
+   def __init__(self, features: int, eps:float = 10**-6) -> None:
+      super().__init__()
+      self.eps = eps
+      self.alpha = nn.Parameter(torch.ones(features))
+      self.bias = nn.Parameter(torch.zeros(features))        
+   
+   def forward(self,x):
+     
+      mean = x.mean(dim=-1,keepdim = True)
+      std = x.std(dim=-1, keepdim = True)
+  
+      return self.alpha * (x-mean)/ (std + self.eps) + self.bias
+
+class FeedForwardBlock(nn.Module):
+    
+   def __init__(self, d_model: int, dff: int, dropout: float) -> None:
+      super().__init__()  
+      self.linear_1 = nn.Linear(d_model,dff)
+      self.dropout = nn.Dropout(dropout)
+      self.linear_2 = nn.Linear(dff,d_model)
+
+   def forward(self,x):
+      return self.linear_2(self.dropout(torch.relu(self.linear_1(x)))) 
+
 class InputEmbeddings(nn.Module):
     def __init__(self, d_model: int, vocab_size: int) -> None:
       super().__init__()
@@ -38,30 +63,19 @@ class PoistionEncoding(nn.Module):
       
       x = x + (self.pe[:,:x.shape[1],:]).requires_grad_(False)
       return self.dropout(x)
-      
-class LayerNormalization(nn.Module):
-   def __init__(self, features: int, eps:float = 10**-6) -> None:
-      super().__init__()
-      self.eps = eps
-      self.alpha = nn.Parameter(torch.ones(features))
-      self.bias = nn.Parameter(torch.zeros(features))        
-   
-   def forward(self,x):
-     
-      mean = x.mean(dim=-1,keepdim = True)
-      std = x.std(dim=-1, keepdim = True)
-  
-      return self.alpha * (x-mean)/ (std + self.eps) + self.bias
-   
-class FeedForwardBlock(nn.Module):
-   def __init__(self, d_model: int, dff: int, dropout: float) -> None:
-      super().__init__()  
-      self.linear_1 = nn.Linear(d_model,dff)
-      self.dropout = nn.Dropout(dropout)
-      self.linear_2 = nn.Linear(dff,d_model)
 
-   def forward(self,x):
-      return self.linear_2(self.dropout(torch.relu(self.linear_1(x))))  
+class ResidualConnection(nn.Module):
+   def __init__(self, features: int, dropout: float)-> None:
+      super().__init__()
+      self.dropout = nn.Dropout(dropout)
+      self.norm = LayerNormalization(features)
+
+   def forward(self, x, sublayer):
+      return x + self.dropout(sublayer(self.norm(x)))
+      
+
+   
+ 
    
 
 class MultiHeadAttentionBlock(nn.Module):
@@ -86,7 +100,7 @@ class MultiHeadAttentionBlock(nn.Module):
       d_k = query.shape[-1]
 
       attention_scores = (query @ key.transpose(-2,-1))/math.sqrt(d_k)
-      print(attention_scores.shape)
+      #print(attention_scores.shape)
       if mask is not None:
          attention_scores=attention_scores.masked_fill_(mask == 0, -1e9)
       attention_scores = attention_scores.softmax(dim=-1)
@@ -115,14 +129,7 @@ class MultiHeadAttentionBlock(nn.Module):
 
             
 
-class ResidualConnection(nn.Module):
-   def __init__(self, features: int, dropout: float)-> None:
-      super().__init__()
-      self.dropout = nn.Dropout(dropout)
-      self.norm = LayerNormalization(features)
 
-   def forward(self, x, sublayer):
-      return x + self.dropout(sublayer(self.norm(x)))
       
 class EncoderBlock(nn.Module):
    def __init__(self, features: int, self_attention_block: MultiHeadAttentionBlock, feed_forward_block: FeedForwardBlock, dropout: float) -> None:
@@ -231,8 +238,8 @@ def build_transformer(src_vocab_size: int, tgt_vocab_size: int, src_seq_len: int
        decoder_block = DecoderBlock(d_model,decoder_self_attention_block,decoder_cross_attention_block,decoder_feed_forward_block,dropout)
        decoder_blocks.append(decoder_block)
 
-    encoder = Encoder(d_model,encoder_blocks) 
-    decoder = Decoder(d_model,decoder_blocks)
+    encoder = Encoder(d_model,nn.ModuleList(encoder_blocks)) 
+    decoder = Decoder(d_model,nn.ModuleList(decoder_blocks))
 
     projection_layer = ProjectionLayer(d_model, tgt_vocab_size)
 
@@ -241,6 +248,6 @@ def build_transformer(src_vocab_size: int, tgt_vocab_size: int, src_seq_len: int
     for p in transformer.parameters():
        if p.dim() > 1:
           nn.init.xavier_uniform_(p)
-    print("HHHHHHiiiiii")
+    
     return transformer      
 
